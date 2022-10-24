@@ -4008,27 +4008,21 @@ self.C3_GetObjectRefTable = function () {
 		C3.Plugins.System.Acts.GoToLayout,
 		C3.Plugins.System.Acts.SetVar,
 		C3.Plugins.Sprite.Exps.Count,
-		C3.Plugins.Text.Acts.SetText,
 		C3.Plugins.Sprite.Acts.SetSize,
-		C3.Plugins.Text.Acts.SetVisible,
 		C3.Plugins.Sprite.Acts.SetInstanceVar,
 		C3.Plugins.Sprite.Exps.X,
 		C3.Plugins.Sprite.Exps.Y,
 		C3.Behaviors.DragnDrop.Acts.SetEnabled,
 		C3.Plugins.Sprite.Acts.Destroy,
 		C3.Plugins.Particles.Acts.Destroy,
-		C3.Plugins.System.Cnds.Compare,
-		C3.Plugins.System.Exps.layoutname,
-		C3.Plugins.Audio.Acts.Play,
+		C3.Plugins.Text.Acts.SetVisible,
 		C3.Plugins.System.Cnds.ForEachOrdered,
 		C3.Plugins.System.Exps.loopindex,
 		C3.Plugins.System.Cnds.PickLastCreated,
+		C3.Plugins.System.Cnds.Compare,
+		C3.Plugins.System.Exps.layoutname,
 		C3.Plugins.System.Cnds.CompareVar,
-		C3.Behaviors.Tween.Acts.TweenValue,
-		C3.Plugins.Audio.Cnds.OnEnded,
-		C3.Plugins.System.Exps.zeropad,
-		C3.Plugins.System.Exps.int,
-		C3.Behaviors.Tween.Exps.Value,
+		C3.Behaviors.Tween.Acts.ResumeAllTweens,
 		C3.Behaviors.DragnDrop.Cnds.OnDragStart,
 		C3.Plugins.Sprite.Acts.MoveToTop,
 		C3.Plugins.Sprite.Acts.SetAnim,
@@ -4037,12 +4031,13 @@ self.C3_GetObjectRefTable = function () {
 		C3.Behaviors.DragnDrop.Cnds.OnDrop,
 		C3.Plugins.Sprite.Cnds.IsBoolInstanceVarSet,
 		C3.Plugins.System.Cnds.Else,
+		C3.Plugins.Audio.Acts.Play,
 		C3.Plugins.Browser.Acts.ConsoleLog,
-		C3.Plugins.System.Acts.RestartLayout,
 		C3.Plugins.System.Cnds.ForEach,
 		C3.Plugins.System.Acts.AddVar,
 		C3.Behaviors.DragnDrop.Cnds.IsDragging,
 		C3.Plugins.Sprite.Cnds.CompareInstanceVar,
+		C3.Behaviors.Tween.Acts.PauseAllTweens,
 		C3.Plugins.System.Acts.NextPrevLayout,
 		C3.Plugins.System.Acts.CreateObject,
 		C3.Plugins.Particles.Acts.SetAngle,
@@ -4052,7 +4047,16 @@ self.C3_GetObjectRefTable = function () {
 		C3.Plugins.System.Exps.choose,
 		C3.Plugins.System.Exps.random,
 		C3.Plugins.Sprite.Acts.SetAnimFrame,
-		C3.Plugins.Sprite.Exps.AnimationFrameCount
+		C3.Plugins.Sprite.Exps.AnimationFrameCount,
+		C3.Behaviors.Tween.Cnds.IsPlaying,
+		C3.Plugins.Text.Acts.SetText,
+		C3.Plugins.System.Exps.zeropad,
+		C3.Plugins.System.Exps.int,
+		C3.Behaviors.Tween.Exps.Value,
+		C3.Plugins.Sprite.Acts.SetAngle,
+		C3.Behaviors.Tween.Cnds.IsPaused,
+		C3.Behaviors.Tween.Acts.TweenValue,
+		C3.Plugins.Audio.Cnds.OnEnded
 	];
 };
 self.C3_JsPropNameTable = [
@@ -4085,6 +4089,7 @@ self.C3_JsPropNameTable = [
 	{saveY: 0},
 	{block: 0},
 	{timer_panel: 0},
+	{save_ang: 0},
 	{timer_pin: 0},
 	{timer_panel_point: 0},
 	{timer: 0},
@@ -4095,6 +4100,7 @@ self.C3_JsPropNameTable = [
 	{Sine2: 0},
 	{Confetti: 0},
 	{Particles: 0},
+	{time_manager: 0},
 	{beads: 0},
 	{DragDrop: 0},
 	{blocks: 0},
@@ -4220,32 +4226,16 @@ self.C3_ExpressionFuncs = [
 			const n0 = p._GetNode(0);
 			return () => n0.ExpObject();
 		},
-		() => "00:20",
+		p => {
+			const f0 = p._GetNode(0).GetBoundMethod();
+			return () => (0.0675 * f0());
+		},
 		p => {
 			const f0 = p._GetNode(0).GetBoundMethod();
 			return () => f0();
 		},
 		() => "1",
-		() => "intro",
-		() => "introduction",
-		() => "first-half",
-		() => "second-half",
-		() => 359.999,
-		() => 10,
-		p => {
-			const f0 = p._GetNode(0).GetBoundMethod();
-			return () => (0.0675 * f0());
-		},
 		() => "play",
-		() => 180,
-		() => "timer",
-		() => 20,
-		p => {
-			const f0 = p._GetNode(0).GetBoundMethod();
-			const f1 = p._GetNode(1).GetBoundMethod();
-			const n2 = p._GetNode(2);
-			return () => ("00:" + f0(f1(n2.ExpBehavior("timer")), 2));
-		},
 		() => "Dragging",
 		() => "drop-in",
 		() => "drop-out",
@@ -4254,6 +4244,8 @@ self.C3_ExpressionFuncs = [
 			return () => n0.ExpInstVar_Family();
 		},
 		() => "Default",
+		() => "timer",
+		() => "over",
 		() => "timeup",
 		() => 40,
 		p => {
@@ -4261,7 +4253,6 @@ self.C3_ExpressionFuncs = [
 			return () => v0.GetValue();
 		},
 		() => "4",
-		() => "over",
 		() => 1500,
 		() => -10,
 		() => "POP",
@@ -4278,7 +4269,29 @@ self.C3_ExpressionFuncs = [
 			const f0 = p._GetNode(0).GetBoundMethod();
 			const n1 = p._GetNode(1);
 			return () => f0(n1.ExpObject());
-		}
+		},
+		p => {
+			const f0 = p._GetNode(0).GetBoundMethod();
+			const f1 = p._GetNode(1).GetBoundMethod();
+			const n2 = p._GetNode(2);
+			return () => ("00:" + f0(f1(n2.ExpBehavior("timer")), 2));
+		},
+		() => "first-half",
+		p => {
+			const n0 = p._GetNode(0);
+			return () => n0.ExpBehavior("first-half");
+		},
+		() => "second-half",
+		p => {
+			const n0 = p._GetNode(0);
+			return () => n0.ExpBehavior("second-half");
+		},
+		() => 180,
+		() => 360,
+		() => 10,
+		() => "introduction",
+		() => "00:20",
+		() => 20
 ];
 
 
